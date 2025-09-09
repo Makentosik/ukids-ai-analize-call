@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
     const n8nPayload = {
       id: call.id,
       text: call.callText || '',
-      checklist: checklist.items.map((item) => ({
-        title: item.title,
+      checklist: checklist.items.map((item, index) => ({
+        title: `${index + 1}.${item.title}`,
         description: item.description || null,
         evaluationType: item.evaluationType,
       })),

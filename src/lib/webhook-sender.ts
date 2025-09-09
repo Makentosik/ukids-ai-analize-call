@@ -76,8 +76,8 @@ export async function sendAutoWebhook(callId: string, userId: string) {
     const n8nPayload = {
       id: call.id,
       text: call.callText || '', // Используем текст звонка или пустую строку
-      checklist: checklist.items.map(item => ({
-        title: item.title,
+      checklist: checklist.items.map((item, index) => ({
+        title: `${index + 1}.${item.title}`,
         description: item.description || null,
       })),
       reviewId: review.id, // Добавляем ID проверки

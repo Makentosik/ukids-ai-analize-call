@@ -107,8 +107,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const n8nPayload = {
         id: call.id,
         text: call.callText || commentText || '', // Используем текст звонка в первую очередь
-        checklist: checklist.items.map(item => ({
-          title: item.title,
+        checklist: checklist.items.map((item, index) => ({
+          title: `${index + 1}.${item.title}`,
           description: item.description || null,
           evaluationType: item.evaluationType, // Добавляем тип оценки
         })),
