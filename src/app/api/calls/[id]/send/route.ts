@@ -122,7 +122,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
 
       // Отправляем данные в n8n (продакшн endpoint)
-      const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'https://miquenaluekos.beget.app/webhook-test/callai';
+      const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'https://miquenaluekos.beget.app/webhook/callai';
 
       console.log('Отправляем в n8n:', n8nPayload);
 
