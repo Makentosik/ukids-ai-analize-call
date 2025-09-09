@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест форматирования дат</title>
+</head>
+<body>
+    <h1>Тест форматирования дат</h1>
+    <div id="results"></div>
+
+    <script>
+        const LOCALE = 'ru-RU';
+
+        const dt = (d) => {
+            const date = new Date(d);
+            if (isNaN(date.getTime())) {
+                return 'Неверная дата';
+            }
+            return new Intl.DateTimeFormat(LOCALE, { 
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Europe/Moscow'
+            }).format(date);
+        };
+
+        // Тестовые даты
+        const testDates = [
+            new Date(), // сейчас
+            '2025-09-08T12:55:00Z', // UTC время
+            '2025-09-08T15:55:00+03:00', // московское время
+            '2025-08-09T18:21:00Z', // другая дата
+        ];
+
+        let results = '<h2>Результаты:</h2>';
+        testDates.forEach((date, i) => {
+            const formatted = dt(date);
+            results += `<p><strong>Дата ${i+1}:</strong> ${date} → ${formatted}</p>`;
+        });
+
+        document.getElementById('results').innerHTML = results;
+    </script>
+</body>
+</html>

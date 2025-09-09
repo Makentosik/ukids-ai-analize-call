@@ -1,0 +1,21 @@
+🔄 Если проблемы продолжаются - пересоздайте проект:
+
+1. В Vercel Dashboard:
+   - Settings → General → Delete Project
+   
+2. Создайте новый проект:
+   - New Project → Import from GitHub
+   - Выберите ваш репозиторий
+   - Framework: Next.js (автоматически)
+   
+3. Сразу добавьте переменные окружения:
+   DATABASE_URL=postgres://9189e5555656e98e4b84ae0597975ca0759fcbf50356f876b89c871f39fdda83:sk_EuD3gH86uYXqAmgV5wUFc@db.prisma.io:5432/postgres?sslmode=require
+   NEXTAUTH_SECRET=I75qIb3tLEyQQ1O8inCL+Cbmn1ypIgKze+U18UFwfos=
+   NEXTAUTH_URL=https://[новый-домен].vercel.app
+   N8N_WEBHOOK_URL=https://miquenaluekos.beget.app/webhook/callai
+   N8N_WEBHOOK_SECRET=ваш-секрет
+   NODE_ENV=production
+   
+4. Deploy
+
+Это должно решить все проблемы с секретами!

@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  name              String
+  passwordHash      String
+  role              UserRole
+  createdAt         DateTime            @default(now())
+  requestedReviews  CallReview[]        @relation("ReviewRequester")
+  createdChecklists ChecklistTemplate[] @relation("ChecklistCreator")
+
+  @@map("users")
+}
+
+model Call {
+  id           String       @id
+  dealId       String
+  createdAt    DateTime
+  employeeName String
+  managerName  String
+  payload      Json
+  callText     String?
+  initiatedBy  String?
+  reviews      CallReview[]
+
+  @@map("calls")
+}
+
+model ChecklistTemplate {
+  id          String            @id @default(cuid())
+  title       String
+  description String?
+  isActive    Boolean           @default(true)
+  isDefault   Boolean           @default(false)
+  createdById String
+  createdAt   DateTime          @default(now())
+  reviews     CallReview[]
+  items       ChecklistItem[]
+  createdBy   User              @relation("ChecklistCreator", fields: [createdById], references: [id])
+
+  @@map("checklist_templates")
+}
+
+model ChecklistItem {
+  id             String            @id @default(cuid())
+  templateId     String
+  title          String
+  description    String
+  orderIndex     Int
+  evaluationType EvaluationType    @default(SCALE_1_10)
+  template       ChecklistTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_items")
+}
+
+model CallReview {
+  id              String            @id @default(cuid())
+  callId          String
+  templateId      String
+  requestedById   String?
+  commentText     String?
+  status          ReviewStatus      @default(PENDING)
+  n8nResponse     Json?
+  createdAt       DateTime          @default(now())
+  analysisResults Json?
+  completedAt     DateTime?
+  requestedBy     User?             @relation("ReviewRequester", fields: [requestedById], references: [id])
+  template        ChecklistTemplate @relation(fields: [templateId], references: [id])
+  call            Call              @relation(fields: [callId], references: [id])
+
+  @@map("call_reviews")
+}
+
+enum UserRole {
+  ADMINISTRATOR
+  OCC_MANAGER
+  SUPERVISOR
+}
+
+enum ReviewStatus {
+  PENDING
+  SENT
+  SUCCESS
+  FAILED
+}
+
+enum EvaluationType {
+  SCALE_1_10
+  YES_NO
+}

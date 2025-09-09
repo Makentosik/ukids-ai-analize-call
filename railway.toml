@@ -1,0 +1,16 @@
+[build]
+buildCommand = "npm install && npx prisma generate && npm run build"
+
+[deploy]
+startCommand = "npx prisma migrate deploy && npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+
+[environments.production.variables]
+NODE_ENV = "production"
+PORT = "3000"
+
+[environments.production.services.web]
+source = "."
+domains = ["your-app-name.railway.app"]

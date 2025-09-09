@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Send Request</title>
+</head>
+<body>
+    <h1>Тестирование запроса отправки проверки</h1>
+    <button onclick="testRequest()">Отправить тестовый запрос</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testRequest() {
+            const resultElement = document.getElementById('result');
+            
+            try {
+                // Тестовые данные - точно такие же как в форме
+                const testData = {
+                    templateId: 'some-test-template-id',
+                    commentText: 'Тестовый комментарий'
+                };
+                
+                console.log('Отправляем данные:', testData);
+                
+                const response = await fetch('https://ukids-dashboard-byobhk8zs-kekits-projects.vercel.app/api/calls/call_test_001/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                resultElement.textContent = `
+Status: ${response.status}
+Response:
+${JSON.stringify(result, null, 2)}
+                `;
+                
+            } catch (error) {
+                resultElement.textContent = `Ошибка: ${error.message}`;
+                console.error('Ошибка запроса:', error);
+            }
+        }
+    </script>
+</body>
+</html>

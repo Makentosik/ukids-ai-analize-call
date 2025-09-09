@@ -1,0 +1,250 @@
+{
+  "info": {
+    "name": "CallAI API",
+    "description": "Коллекция для тестирования CallAI API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Calls",
+      "item": [
+        {
+          "name": "Получить список звонков",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/calls?page=1&limit=20&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calls"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "createdAt"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Добавить звонок (авторизованный)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "next-auth.session-token=YOUR_SESSION_TOKEN",
+                "description": "Замените YOUR_SESSION_TOKEN на реальный токен сессии"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"call-postman-{{$randomInt}}\",\n  \"dealId\": \"deal-{{$randomInt}}\",\n  \"createdAt\": \"{{$isoTimestamp}}\",\n  \"employeeName\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"managerName\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"payload\": {\n    \"duration\": {{$randomInt}},\n    \"phoneNumber\": \"+7 ({{$randomInt}}) {{$randomInt}}-{{$randomInt}}-{{$randomInt}}\",\n    \"callType\": \"inbound\",\n    \"notes\": \"Тестовый звонок из Postman\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/calls",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calls"]
+            }
+          }
+        },
+        {
+          "name": "Добавить звонок через Webhook (для n8n)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer %;A:Tl^^FNdxXdeV:h.n(Yz1/HQ7zDq$"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"call-webhook-{{$randomInt}}\",\n  \"deal_id\": \"deal-webhook-{{$randomInt}}\",\n  \"created_at\": \"{{$isoTimestamp}}\",\n  \"employe\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"employe_rug\": \"{{$randomFirstName}} {{$randomLastName}}\",\n  \"initiated_by\": \"{{$randomFirstName}} {{$randomLastName}} (БА24)\",\n  \"call_text\": \"Привет, я ищу менеджера по продажам. Можете мне помочь? Мне нужна консультация по услугам. Конечно, я могу вам помочь. Какова ваша потребность?\",\n  \"duration\": {{$randomInt}},\n  \"phoneNumber\": \"+7 ({{$randomInt}}) {{$randomInt}}-{{$randomInt}}-{{$randomInt}}\",\n  \"callType\": \"inbound\",\n  \"notes\": \"Тестовый звонок через webhook из Postman\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/webhook/calls",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "webhook", "calls"]
+            }
+          }
+        },
+        {
+          "name": "Отправить результаты анализа (n8n → App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer %;A:Tl^^FNdxXdeV:h.n(Yz1/HQ7zDq$"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"test-call-1\",\n  \"reviewId\": \"review-id-from-previous-request\",\n  \"ok\": true,\n  \"checklist\": [],\n  \"triggers\": [],\n  \"recommendations\": [],\n  \"stats\": {\n    \"total\": 7,\n    \"done\": 7,\n    \"notDone\": 0,\n    \"unknown\": 0\n  },\n  \"markdown\": \"### Чек-лист\\n\\n\\n### Рекомендации\\n_нет_\\n\\n### Триггеры\\n_нет_\\n\\n**Итого:** выполнено 7/7, не выполнено 0, неизвестно 0.\",\n  \"original\": {\n    \"id\": \"test-call-1\",\n    \"results\": [\n      {\n        \"step\": \"Поздоровался с клиентом\",\n        \"done\": true,\n        \"evidence\": \"Здравствуйте, меня зовут Анна\"\n      },\n      {\n        \"step\": \"Представился и назвал компанию\",\n        \"done\": true,\n        \"evidence\": \"я из Академии Ukids\"\n      },\n      {\n        \"step\": \"Выяснил потребность клиента\",\n        \"done\": true,\n        \"evidence\": \"Скажите, пожалуйста, вы замечали какие-то сложности у ребёнка\"\n      },\n      {\n        \"step\": \"Предложил подходящий продукт/услугу\",\n        \"done\": true,\n        \"evidence\": \"Тогда мы подготовим индивидуальный план, который будет максимально полезен вашему ребёнку\"\n      },\n      {\n        \"step\": \"Ответил на все вопросы клиента\",\n        \"done\": true,\n        \"evidence\": \"Хорошо, понял вас, спасибо за уточнение\"\n      },\n      {\n        \"step\": \"Договорился о следующих шагах\",\n        \"done\": true,\n        \"evidence\": \"Занятие длится 45 минут, после него я расскажу, какие шаги будут дальше\"\n      },\n      {\n        \"step\": \"Поблагодарил за время\",\n        \"done\": true,\n        \"evidence\": \"Спасибо вам за время\"\n      }\n    ],\n    \"summary\": \"Менеджер выполнил все 7 шагов, звонок прошёл успешно.\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/webhook/n8n/results",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "webhook", "n8n", "results"]
+            }
+          }
+        },
+        {
+          "name": "Отправить чек-лист на анализ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "next-auth.session-token=YOUR_SESSION_TOKEN",
+                "description": "Замените YOUR_SESSION_TOKEN на реальный токен сессии"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateId\": \"default-checklist\",\n  \"commentText\": \"Тестовый комментарий к проверке\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/calls/{{callId}}/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calls", "{{callId}}", "send"]
+            }
+          }
+        },
+        {
+          "name": "Удалить проверку",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "next-auth.session-token=YOUR_SESSION_TOKEN",
+                "description": "Замените YOUR_SESSION_TOKEN на реальный токен сессии"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/calls/{{callId}}/reviews/{{reviewId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calls", "{{callId}}", "reviews", "{{reviewId}}"]
+            }
+          }
+        },
+        {
+          "name": "Получить конкретный звонок",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/calls/{{callId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calls", "{{callId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Checklists",
+      "item": [
+        {
+          "name": "Получить список чек-листов",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/checklists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "checklists"]
+            }
+          }
+        },
+        {
+          "name": "Создать чек-лист",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Тестовый чек-лист {{$randomInt}}\",\n  \"description\": \"Описание тестового чек-листа\",\n  \"isActive\": true,\n  \"items\": [\n    {\n      \"text\": \"Проверить качество звука\",\n      \"weight\": 8,\n      \"orderIndex\": 0\n    },\n    {\n      \"text\": \"Оценить вежливость общения\",\n      \"weight\": 7,\n      \"orderIndex\": 1\n    },\n    {\n      \"text\": \"Проверить соблюдение скрипта\",\n      \"weight\": 9,\n      \"orderIndex\": 2\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checklists",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "checklists"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "callId",
+      "value": "test-call-1",
+      "type": "string"
+    },
+    {
+      "key": "reviewId",
+      "value": "cmf5g7cgc0001v8x4zpyl04qa",
+      "type": "string"
+    }
+  ]
+}

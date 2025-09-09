@@ -1,0 +1,106 @@
+// Prisma схема для CallAI приложения
+// Документация: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Роли пользователей в системе
+enum UserRole {
+  ADMIN     // Администратор - полный доступ
+  MANAGER   // Менеджер - управление чек-листами и просмотр всех звонков
+  EMPLOYEE  // Сотрудник - просмотр только своих звонков
+}
+
+// Статус проверки звонка
+enum ReviewStatus {
+  PENDING  // Ожидает отправки
+  SENT     // Отправлено в n8n
+  SUCCESS  // Успешно обработано
+  FAILED   // Ошибка при обработке
+}
+
+// Модель пользователя
+model User {
+  id           String   @id @default(cuid()) // Уникальный идентификатор
+  email        String   @unique // Email пользователя (уникальный)
+  name         String   // Имя пользователя
+  passwordHash String   // Хэш пароля
+  role         UserRole // Роль пользователя в системе
+  createdAt    DateTime @default(now()) // Дата создания
+  updatedAt    DateTime @updatedAt // Дата последнего обновления
+  
+  // Связи с другими моделями
+  requestedReviews  CallReview[] @relation("ReviewRequester")  // Запрошенные проверки
+  
+  @@map("users")
+}
+
+// Модель звонка (данные приходят из n8n)
+model Call {
+  id           String   @id // ID из n8n
+  dealId       String   // Идентификатор сделки
+  createdAt    DateTime // Время создания звонка
+  employeeName String   // Имя сотрудника, совершившего звонок
+  managerName  String   // Имя менеджера
+  payload      String   // Дополнительные данные звонка в JSON формате (SQLite не поддерживает Json)
+  
+  // Связи
+  reviews CallReview[] // Проверки этого звонка
+  
+  @@map("calls")
+}
+
+// Чек-лист для оценки звонков
+model Checklist {
+  id          String  @id @default(cuid()) // Уникальный идентификатор
+  name        String  // Название чек-листа
+  description String? // Описание чек-листа
+  isActive    Boolean @default(true) // Активен ли чек-лист
+  createdAt   DateTime @default(now()) // Дата создания
+  updatedAt   DateTime @updatedAt // Дата последнего обновления
+  
+  // Связи
+  items     ChecklistItem[]  // Элементы чек-листа
+  CallReview CallReview[]    // Проверки с использованием этого чек-листа
+  
+  @@map("checklists")
+}
+
+// Элемент чек-листа
+model ChecklistItem {
+  id          String @id @default(cuid()) // Уникальный идентификатор
+  checklistId String // ID чек-листа
+  text        String // Текст элемента чек-листа
+  weight      Int    @default(1) // Вес элемента (для подсчета оценки)
+  orderIndex  Int    // Порядковый номер для сортировки
+  
+  // Связи
+  checklist Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  
+  @@map("checklist_items")
+}
+
+// Проверка звонка с использованием чек-листа
+model CallReview {
+  id            String       @id @default(cuid()) // Уникальный идентификатор
+  callId        String       // ID звонка
+  checklistId   String       // ID используемого чек-листа
+  requestedById String       // ID пользователя, запросившего проверку
+  commentText   String?      // Комментарий к проверке
+  status        ReviewStatus @default(PENDING) // Статус проверки
+  n8nResponse   String?      // Ответ от n8n в JSON формате (SQLite не поддерживает Json)
+  createdAt     DateTime     @default(now()) // Дата создания
+  
+  // Связи
+  call        Call      @relation(fields: [callId], references: [id])
+  checklist   Checklist @relation(fields: [checklistId], references: [id])
+  requestedBy User      @relation("ReviewRequester", fields: [requestedById], references: [id])
+  
+  @@map("call_reviews")
+}
