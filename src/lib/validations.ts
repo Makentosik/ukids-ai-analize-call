@@ -19,7 +19,7 @@ export const sendToN8nSchema = z.object({
   checklist: z.array(z.object({
     title: z.string(),
     description: z.string().optional(),
-    evaluationType: z.enum(['SCALE_1_10', 'YES_NO']).optional(),
+    evaluationType: z.enum(['SCALE_1_10', 'YES_NO']), // Убираем optional() - это поле обязательное
   })),
   reviewId: z.string().optional(),
 });
@@ -90,7 +90,7 @@ export const n8nResultsSchema = z.object({
   checklist: z.array(z.object({
     step: z.string(),
     description: z.string().optional(),
-    evaluationType: z.enum(['SCALE_1_10', 'YES_NO']).optional(),
+    evaluationType: z.enum(['SCALE_1_10', 'YES_NO']), // Убираем optional() - это поле важно для анализа
     done: z.boolean().optional(), // Для YES_NO типов
     score: z.number().min(1).max(10).optional(), // Для SCALE_1_10 типов
     evidence: z.string().optional(),
@@ -109,7 +109,7 @@ export const n8nResultsSchema = z.object({
     results: z.array(z.object({
       step: z.string(),
       description: z.string().optional(),
-      evaluationType: z.enum(['SCALE_1_10', 'YES_NO']).optional(),
+      evaluationType: z.enum(['SCALE_1_10', 'YES_NO']), // Также убираем optional()
       done: z.boolean().optional(), // Для YES_NO типов
       score: z.number().min(1).max(10).optional(), // Для SCALE_1_10 типов
       evidence: z.string().optional(),

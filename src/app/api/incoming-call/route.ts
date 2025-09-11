@@ -86,10 +86,22 @@ export async function POST(request: NextRequest) {
       reviewId: review.id,
     };
 
+    console.log('🔍 DEBUG: Автоматический payload для n8n:', JSON.stringify(n8nPayload, null, 2));
+
     // Валидация payload перед отправкой
     const validation = sendToN8nSchema.safeParse(n8nPayload);
     if (!validation.success) {
-      console.error('Ошибка формирования payload для n8n:', validation.error);
+      console.error('❌ Ошибка формирования payload для n8n:', validation.error.errors);
+      // Возвращаем ошибку, так как payload некорректен
+      return NextResponse.json(
+        { 
+          error: 'Ошибка формирования payload для n8n', 
+          details: validation.error.errors 
+        }, 
+        { status: 400 }
+      );
+    } else {
+      console.log('✅ Валидация payload прошла успешно');
     }
 
     // 5) Отправляем в n8n на анализ
