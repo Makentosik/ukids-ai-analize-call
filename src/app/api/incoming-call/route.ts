@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       checklist: checklist.items.map((item, index) => ({
         title: `${index + 1}.${item.title}`,
         description: item.description || null,
-        evaluationType: item.evaluationType,
+        evaluationType: String(item.evaluationType), // Приводим enum к строке
       })),
       reviewId: review.id,
     };

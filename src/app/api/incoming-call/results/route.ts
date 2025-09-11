@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
           items: updatedReview.template.items.map(item => ({
             title: item.title,
             description: item.description,
-            evaluationType: item.evaluationType,
+            evaluationType: String(item.evaluationType), // Приводим enum к строке
             orderIndex: item.orderIndex,
           })),
         },
