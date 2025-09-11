@@ -86,6 +86,14 @@ export async function POST(request: NextRequest) {
       reviewId: review.id,
     };
 
+    // Логируем данные чек-листа для диагностики
+    console.log('🔍 DEBUG: Первые 3 элемента checklist:', checklist.items.slice(0, 3).map(item => ({
+      title: item.title,
+      evaluationType: item.evaluationType,
+      evaluationTypeType: typeof item.evaluationType,
+      evaluationTypeString: String(item.evaluationType),
+    })));
+
     console.log('🔍 DEBUG: Автоматический payload для n8n:', JSON.stringify(n8nPayload, null, 2));
 
     // Валидация payload перед отправкой

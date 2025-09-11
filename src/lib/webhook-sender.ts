@@ -79,6 +79,7 @@ export async function sendAutoWebhook(callId: string, userId: string) {
       checklist: checklist.items.map((item, index) => ({
         title: `${index + 1}.${item.title}`,
         description: item.description || null,
+        evaluationType: String(item.evaluationType), // Добавляем тип оценки
       })),
       reviewId: review.id, // Добавляем ID проверки
     };
