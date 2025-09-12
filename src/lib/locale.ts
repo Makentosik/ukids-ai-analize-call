@@ -10,8 +10,8 @@ export const dt = (d: Date | string) => {
     month: 'short',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Moscow'
+    minute: '2-digit'
+    // timeZone убран - будет использоваться локальный часовой пояс
   }).format(date);
 };
 
@@ -23,8 +23,8 @@ export const dateOnly = (d: Date | string) => {
   return new Intl.DateTimeFormat(LOCALE, { 
     year: 'numeric',
     month: 'short',
-    day: '2-digit',
-    timeZone: 'Europe/Moscow'
+    day: '2-digit'
+    // timeZone убран - будет использоваться локальный часовой пояс
   }).format(date);
 };
 
@@ -35,8 +35,8 @@ export const timeOnly = (d: Date | string) => {
   }
   return new Intl.DateTimeFormat(LOCALE, { 
     hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Europe/Moscow'
+    minute: '2-digit'
+    // timeZone убран - будет использоваться локальный часовой пояс
   }).format(date);
 };
 
