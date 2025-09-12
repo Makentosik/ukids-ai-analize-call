@@ -92,7 +92,7 @@ export const n8nResultsSchema = z.object({
     description: z.string().optional(),
     evaluationType: z.enum(['SCALE_1_10', 'YES_NO']), // Убираем optional() - это поле важно для анализа
     done: z.boolean().optional(), // Для YES_NO типов
-    score: z.number().min(1).max(10).optional(), // Для SCALE_1_10 типов
+    score: z.number().min(0).max(10).optional(), // Для SCALE_1_10 типов
     evidence: z.string().optional(),
   })).optional(),
   triggers: z.array(z.string()).optional(),
@@ -111,7 +111,7 @@ export const n8nResultsSchema = z.object({
       description: z.string().optional(),
       evaluationType: z.enum(['SCALE_1_10', 'YES_NO']), // Также убираем optional()
       done: z.boolean().optional(), // Для YES_NO типов
-      score: z.number().min(1).max(10).optional(), // Для SCALE_1_10 типов
+      score: z.number().min(0).max(10).optional(), // Для SCALE_1_10 типов
       evidence: z.string().optional(),
     })),
     summary: z.string().optional(),
