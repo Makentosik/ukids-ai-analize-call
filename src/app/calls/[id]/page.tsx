@@ -219,7 +219,7 @@ export default function CallDetailsPage() {
     };
 
     fetchData();
-  }, [callId, session]);
+  }, [callId, session?.user?.id]);
 
   const deleteReview = async (reviewId: string) => {
     if (!call) return;

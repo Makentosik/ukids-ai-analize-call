@@ -14,7 +14,10 @@ export default function SessionProviderWrapper({
   session,
 }: SessionProviderWrapperProps) {
   return (
-    <SessionProvider session={session}>
+    <SessionProvider 
+      session={session}
+      refetchOnWindowFocus={false}
+    >
       {children}
     </SessionProvider>
   );
