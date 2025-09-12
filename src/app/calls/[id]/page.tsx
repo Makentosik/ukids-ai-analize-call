@@ -58,7 +58,8 @@ import {
   AlertCircle,
   CheckCircle,
   MoreHorizontal,
-  Trash2
+  Trash2,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { dt, uiText, toastMessages } from '@/lib/locale';
@@ -131,6 +132,7 @@ export default function CallDetailsPage() {
   const [sending, setSending] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const {
     register,
@@ -143,6 +145,29 @@ export default function CallDetailsPage() {
   });
 
   const watchedTemplateId = watch('templateId');
+
+  // Функция для ручного обновления данных
+  const refreshCallData = async () => {
+    if (!callId || !session || refreshing) return;
+
+    try {
+      setRefreshing(true);
+      const callResponse = await fetch(`/api/calls/${callId}`);
+      
+      if (callResponse.ok) {
+        const callData = await callResponse.json();
+        setCall(callData);
+        toast.success('Данные обновлены');
+      } else {
+        toast.error('Не удалось обновить данные');
+      }
+    } catch (err) {
+      console.error('Ошибка обновления данных:', err);
+      toast.error('Ошибка обновления данных');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (watchedTemplateId) {
@@ -215,12 +240,14 @@ export default function CallDetailsPage() {
       
       toast.success(`Проверка удалена: ${result.deletedReview?.templateTitle || 'Проверка'}`);
       
-      // Обновляем данные звонка
-      const updatedCallResponse = await fetch(`/api/calls/${callId}`);
-      if (updatedCallResponse.ok) {
-        const updatedCall = await updatedCallResponse.json();
-        setCall(updatedCall);
-      }
+      // Обновляем локально - убираем удаленную проверку
+      setCall(prevCall => {
+        if (!prevCall) return prevCall;
+        return {
+          ...prevCall,
+          reviews: prevCall.reviews.filter(r => r.id !== reviewId)
+        };
+      });
     } catch (error: any) {
       console.error('Ошибка удаления проверки:', error);
       toast.error(error.message || 'Не удалось удалить проверку');
@@ -251,11 +278,15 @@ export default function CallDetailsPage() {
       if (result.success) {
         toast.success(toastMessages.sentToN8n);
         
-        // Обновляем данные звонка, чтобы показать новую проверку
-        const updatedCallResponse = await fetch(`/api/calls/${callId}`);
-        if (updatedCallResponse.ok) {
-          const updatedCall = await updatedCallResponse.json();
-          setCall(updatedCall);
+        // Добавляем новую проверку локально (если есть в ответе)
+        if (result.review) {
+          setCall(prevCall => {
+            if (!prevCall) return prevCall;
+            return {
+              ...prevCall,
+              reviews: [...prevCall.reviews, result.review]
+            };
+          });
         }
         
         // Очищаем форму
@@ -391,8 +422,21 @@ export default function CallDetailsPage() {
             <span className="font-medium">{call.id}</span>
           </div>
           
-          {/* Действия со звонком */}
-          <CallActions call={call} onDeleteSuccess={() => router.push('/calls')} />
+          <div className="flex items-center gap-2">
+            {/* Кнопка обновления */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={refreshCallData}
+              disabled={refreshing}
+              title="Обновить данные"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            
+            {/* Действия со звонком */}
+            <CallActions call={call} onDeleteSuccess={() => router.push('/calls')} />
+          </div>
         </div>
 
         {/* Основная информация о звонке */}
