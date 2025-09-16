@@ -6,7 +6,7 @@ import { parseRussianDate } from '@/lib/utils';
 
 // Webhook эндпоинт для n8n
 export async function POST(request: NextRequest) {
-  console.log('🔴 [WEBHOOK-DEBUG] POST request received at /api/webhook/calls');
+  console.log('🔴 [WEBHOOK-DEBUG] POST request received at /api/webhook/calls (v2 - with Russian date parsing)');
   console.log('🔴 [WEBHOOK-DEBUG] Request URL:', request.url);
   console.log('🔴 [WEBHOOK-DEBUG] Request headers:', Object.fromEntries(request.headers.entries()));
   
