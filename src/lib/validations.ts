@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseRussianDate } from './utils';
 
 // Схема для входящего webhook от n8n
 export const n8nCallWebhookSchema = z.object({
@@ -134,12 +135,19 @@ export type ChangePassword = z.infer<typeof changePasswordSchema>;
 export const parseDateString = (dateStr?: string): Date | undefined => {
   if (!dateStr) return undefined;
   
-  const parsed = new Date(dateStr);
-  if (isNaN(parsed.getTime())) {
+  // Сначала пробуем парсить как русскую дату
+  const russianParsed = parseRussianDate(dateStr);
+  if (russianParsed) {
+    return russianParsed;
+  }
+  
+  // Если не удалось, пробуем стандартный парсинг
+  const standardParsed = new Date(dateStr);
+  if (isNaN(standardParsed.getTime())) {
     return undefined;
   }
   
-  return parsed;
+  return standardParsed;
 };
 
 // Функция для безопасного парсинга JSON

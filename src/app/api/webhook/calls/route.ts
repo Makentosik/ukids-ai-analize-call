@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ReviewStatus, UserRole } from '@prisma/client';
 import { sendAutoWebhook } from '@/lib/webhook-sender';
+import { parseRussianDate } from '@/lib/utils';
 
 // Webhook эндпоинт для n8n
 export async function POST(request: NextRequest) {
@@ -57,13 +58,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Парсим дату с логированием
-    const finalDate = createdAt ? new Date(createdAt) : new Date();
-    console.log('🕰️ Парсим дату:', {
+    // Парсим дату с использованием специальной функции для русского формата
+    let finalDate: Date;
+    if (createdAt) {
+      const parsedDate = parseRussianDate(createdAt);
+      if (parsedDate) {
+        finalDate = parsedDate;
+        console.log('✅ Дата успешно распознана как русский формат:', createdAt, '->', finalDate.toISOString());
+      } else {
+        console.warn('⚠️ Не удалось парсить дату, используем текущее время:', createdAt);
+        finalDate = new Date();
+      }
+    } else {
+      console.log('🕰️ Дата createdAt не предоставлена, используем текущее время');
+      finalDate = new Date();
+    }
+    
+    // Проверяем, что дата валидна перед сохранением в базу
+    if (isNaN(finalDate.getTime())) {
+      console.error('❌ Невалидная дата получена:', {
+        original: createdAt,
+        parsed: finalDate,
+        timestamp: finalDate.getTime()
+      });
+      
+      return NextResponse.json(
+        { 
+          error: 'Невалидная дата создания',
+          details: `Не удалось распознать дату: "${createdAt}". Пожалуйста, используйте формат DD.MM.YYYY HH:MM или ISO 8601`
+        },
+        { status: 400 }
+      );
+    }
+    
+    console.log('🕰️ Проверка даты пройдена:', {
       original: createdAt,
       parsed: finalDate,
       isValid: !isNaN(finalDate.getTime()),
-      timestamp: finalDate.getTime()
+      timestamp: finalDate.getTime(),
+      isoString: finalDate.toISOString()
     });
     
     // Создаем новый звонок
