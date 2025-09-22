@@ -75,18 +75,26 @@ export async function POST(request: NextRequest) {
     }
     
     // Валидация данных
+    console.log('🔍 Получены данные для создания чек-листа:', JSON.stringify(body, null, 2));
+    
     const { createChecklistSchema } = await import('@/lib/validations');
     const validationResult = createChecklistSchema.safeParse(body);
     
     if (!validationResult.success) {
+      console.error('❌ Ошибка валидации чек-листа:');
+      console.error('Error details:', validationResult.error);
+      console.error('Error issues:', validationResult.error.issues);
       return NextResponse.json(
         { 
           error: 'Неверный формат данных',
-          details: validationResult.error.errors
+          details: validationResult.error.issues,
+          receivedData: body
         },
         { status: 400 }
       );
     }
+    
+    console.log('✅ Валидация прошла успешно:', validationResult.data);
 
     const { name, description, isActive, items } = validationResult.data;
 

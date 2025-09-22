@@ -48,10 +48,11 @@ export const createChecklistSchema = z.object({
   description: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
   items: z.array(z.object({
+    id: z.string().optional(), // Временный ID может присутствовать
     text: z.string().min(1, 'Заголовок элемента обязателен').max(200, 'Максимум 200 символов'),
     description: z.string().optional().nullable().refine(
-      (val) => !val || val.length <= 500, 
-      { message: 'Описание не может быть длиннее 500 символов' }
+      (val) => !val || val.length <= 1000, 
+      { message: 'Описание не может быть длиннее 1000 символов' }
     ),
     orderIndex: z.number().int().min(0),
     evaluationType: z.enum(['SCALE_1_10', 'YES_NO']).default('SCALE_1_10'),

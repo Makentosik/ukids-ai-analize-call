@@ -45,8 +45,20 @@ export async function POST(request: NextRequest) {
       managerName, 
       initiatedBy,
       callText,
-      payload = {} 
+      ...otherFields 
     } = body;
+    
+    // Создаем payload из всех остальных полей
+    const payload = {
+      ...otherFields,
+      // Сохраняем основные поля для совместимости
+      duration: body.duration || otherFields.duration,
+      phoneNumber: body.phoneNumber || otherFields.phoneNumber,
+      callType: body.callType || otherFields.callType,
+      notes: body.notes || otherFields.notes
+    };
+    
+    console.log('📦 Payload для сохранения:', payload);
     
     if (!id || !dealId || !employeeName || !managerName) {
       return NextResponse.json(
@@ -109,7 +121,7 @@ export async function POST(request: NextRequest) {
         managerName: String(managerName),
         initiatedBy: initiatedBy ? String(initiatedBy) : null,
         callText: callText ? String(callText) : null,
-        payload: payload || {},
+        payload: payload,
       },
       include: {
         reviews: {
