@@ -17,7 +17,7 @@
     "db:reset:prod": "prisma migrate reset --force --skip-seed",
     "docker:build": "docker build -t callai-app .",
     "docker:run": "docker run -p 3000:3000 callai-app",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && prisma migrate deploy && prisma db seed && next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
